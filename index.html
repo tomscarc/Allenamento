@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Trainer – Calcolo Zona Aerobica per il Dimagrimento</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --primary-soft: #ccfbf1;
+      --accent: #0284c7;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+      --danger-border: #fecaca;
+      --warn: #b45309;
+      --warn-bg: #fffbeb;
+      --warn-border: #fde68a;
+      --z1: #38bdf8;
+      --z2: #10b981;
+      --z3: #f59e0b;
+      --z4: #f97316;
+      --z5: #ef4444;
+      --radius: 14px;
+      --shadow: 0 10px 25px -10px rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #0f766e 100%);
+      color: #fff;
+      padding: 2.2rem 1.25rem 2.6rem;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 0.5rem;
+      font-size: clamp(1.5rem, 3vw, 2.15rem);
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin: 0 auto;
+      max-width: 700px;
+      color: #cbd5e1;
+      font-size: 0.98rem;
+    }
+
+    .container {
+      max-width: 1020px;
+      margin: -1.4rem auto 3rem;
+      padding: 0 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .card h2 {
+      margin: 0 0 1rem;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      color: #0f172a;
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: #fff;
+      color: var(--text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+    }
+
+    .inline-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 9px;
+      padding: 0.72rem 1.2rem;
+      font-size: 0.94rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.08s, background 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .btn-secondary:hover { background: #cbd5e1; }
+
+    .btn-outline {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+    }
+
+    .btn-outline:hover { background: #f8fafc; }
+
+    .btn-tap {
+      background: #0284c7;
+      color: #fff;
+      white-space: nowrap;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.85rem;
+    }
+
+    .btn-tap:hover { background: #0369a1; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+      align-items: center;
+    }
+
+    details {
+      margin-top: 1rem;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--primary-dark);
+      font-size: 0.92rem;
+    }
+
+    details ul {
+      margin: 0.7rem 0 0.2rem;
+      padding-left: 1.2rem;
+      font-size: 0.88rem;
+      color: #334155;
+    }
+
+    details li { margin-bottom: 0.45rem; }
+
+    .tap-box {
+      display: none;
+      margin-top: 0.6rem;
+      padding: 0.85rem;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 10px;
+      font-size: 0.86rem;
+    }
+
+    .tap-box.open { display: block; }
+
+    .tap-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+
+    .tap-readout {
+      font-weight: 700;
+      color: #0369a1;
+      font-size: 1rem;
+    }
+
+    .alert {
+      border-radius: 11px;
+      padding: 1rem 1.15rem;
+      margin-bottom: 1.2rem;
+      font-size: 0.92rem;
+    }
+
+    .alert-danger {
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      color: #7f1d1d;
+    }
+
+    .alert-warn {
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      color: #78350f;
+    }
+
+    .alert-info {
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
+      color: #134e4a;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .metric-card {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 0.95rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .metric-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .metric-value {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .metric-sub {
+      font-size: 0.8rem;
+      color: #475569;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.14rem 0.48rem;
+      border-radius: 999px;
+      width: fit-content;
+      margin-top: 0.2rem;
+    }
+
+    .tag-measured {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .tag-estimated {
+      background: #e0f2fe;
+      color: #075985;
+    }
+
+    .zone-bar {
+      display: flex;
+      height: 16px;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 0.8rem 0 1.1rem;
+      border: 1px solid var(--border);
+    }
+
+    .zone-bar div { flex: 1; }
+    .zb-1 { background: var(--z1); }
+    .zb-2 { background: var(--z2); }
+    .zb-3 { background: var(--z3); }
+    .zb-4 { background: var(--z4); }
+    .zb-5 { background: var(--z5); }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.75rem 0.7rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--surface-alt);
+      color: #334155;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    tr.highlight-row {
+      background: #ecfdf5;
+    }
+
+    .zone-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .concepts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .concept-card {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 1rem;
+    }
+
+    .concept-card h3 {
+      margin: 0 0 0.4rem;
+      font-size: 0.96rem;
+      color: var(--primary-dark);
+    }
+
+    .concept-card p {
+      margin: 0;
+      font-size: 0.87rem;
+      color: #334155;
+    }
+
+    .summary-box {
+      background: linear-gradient(135deg, #0f172a 0%, #134e4a 100%);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .summary-box h2 {
+      color: #fff;
+      margin: 0 0 1rem;
+      font-size: 1.25rem;
+    }
+
+    .summary-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .summary-list li {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+    }
+
+    .summary-list strong {
+      display: block;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #99f6e4;
+      margin-bottom: 0.25rem;
+    }
+
+    .summary-list span {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .disclaimer {
+      font-size: 0.82rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    #results { display: none; }
+    #results.visible { display: block; }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-top: 0.35rem;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: auto;
+      transform: scale(1.15);
+    }
+
+    @media print {
+      body { background: #fff; }
+      header { padding: 1.2rem; }
+      #formCard, .no-print { display: none !important; }
+      .card, .summary-box {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+      .summary-box {
+        background: #f8fafc !important;
+        color: #0f172a !important;
+        border: 2px solid #0f766e;
+      }
+      .summary-box h2 { color: #0f172a !important; }
+      .summary-list li {
+        background: #fff !important;
+        border: 1px solid #cbd5e1 !important;
+      }
+      .summary-list strong { color: #0f766e !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Personal Trainer – Zona Aerobica per il Dimagrimento</h1>
+  <p>Analisi personalizzata della frequenza cardiaca, calcolo delle 5 zone con metodo Karvonen e programma cardiovascolare su misura.</p>
+</header>
+
+<main class="container">
+  <!-- SEZIONE 1: RACCOLTA DATI -->
+  <section class="card" id="formCard">
+    <h2><span class="step-badge">1</span> I tuoi dati personali</h2>
+
+    <form id="ptForm">
+      <div class="form-grid">
+        <div class="field">
+          <label for="sex">1. Sesso *</label>
+          <select id="sex" required>
+            <option value="M">Uomo</option>
+            <option value="F">Donna</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="age">2. Età (anni) *</label>
+          <input type="number" id="age" min="16" max="90" placeholder="es. 38" required />
+        </div>
+
+        <div class="field">
+          <label for="weight">3. Peso corporeo (kg) *</label>
+          <input type="number" id="weight" min="35" max="220" step="0.1" placeholder="es. 78.5" required />
+        </div>
+
+        <div class="field">
+          <label for="height">4. Altezza (cm) *</label>
+          <input type="number" id="height" min="130" max="225" placeholder="es. 176" required />
+        </div>
+
+        <div class="field">
+          <label for="waist">5. Circonferenza vita (cm)</label>
+          <input type="number" id="waist" min="50" max="180" step="0.5" placeholder="es. 92 (opzionale)" />
+          <span class="hint">Utile per valutare il grasso viscerale (WHtR).</span>
+        </div>
+
+        <div class="field">
+          <label for="bodyFat">6. Massa grassa % (se conosciuta)</label>
+          <input type="number" id="bodyFat" min="4" max="60" step="0.1" placeholder="Lascia vuoto per stimarla" />
+          <span class="hint">Se vuota, verrà stimata dai parametri antropometrici.</span>
+        </div>
+
+        <div class="field">
+          <label for="fcRest">7. Frequenza cardiaca a riposo (BPM)</label>
+          <div class="inline-row">
+            <input type="number" id="fcRest" min="35" max="120" placeholder="es. 64 (opzionale)" />
+            <button type="button" class="btn btn-tap" id="toggleTapBtn">Tap BPM</button>
+          </div>
+          <span class="hint">Consigliata per il metodo Karvonen.</span>
+          <div class="tap-box" id="tapBox">
+            <div>Appoggia indice e medio sul polso o sul collo e premi il tasto ad ogni battito (almeno 6 tocchi):</div>
+            <div class="tap-controls">
+              <button type="button" class="btn btn-primary" id="tapBeatBtn">Tocca sul battito</button>
+              <button type="button" class="btn btn-outline" id="resetTapBtn">Azzera</button>
+              <span class="tap-readout" id="tapReadout">-- BPM</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="level">8. Livello di allenamento *</label>
+          <select id="level" required>
+            <option value="principiante">Principiante (sedentario o < 3 mesi costanti)</option>
+            <option value="intermedio">Intermedio (2–4 allenamenti/sett. da mesi)</option>
+            <option value="avanzato">Avanzato (allenamento strutturato regolare)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="activity">9. Attività aerobica principale *</label>
+          <select id="activity" required>
+            <option value="camminata">Camminata veloce / in salita</option>
+            <option value="corsa">Corsa</option>
+            <option value="cyclette">Cyclette / Bici</option>
+            <option value="ellittica">Ellittica</option>
+            <option value="nuoto">Nuoto</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label for="medicalNotes">10. Patologie cardiovascolari/metaboliche o farmaci che influenzano il battito</label>
+          <textarea id="medicalNotes" rows="2" placeholder="Es. betabloccanti, ipertensione, diabete, aritmie, asma... (lascia vuoto se nessuno)"></textarea>
+          <div class="checkbox-row">
+            <input type="checkbox" id="hasMedical" />
+            <label for="hasMedical" style="font-weight:500;">Segnala la presenza di condizioni mediche, sintomi o farmaci che alterano la frequenza cardiaca</label>
+          </div>
+        </div>
+      </div>
+
+      <details>
+        <summary>Non conosci alcuni dati? Ecco come rilevarli correttamente</summary>
+        <ul>
+          <li><strong>Circonferenza vita:</strong> in piedi, addome rilassato (senza tirare in dentro), misura con un metro da sarto nel punto più stretto del busto o appena sopra l'ombelico, al termine di una normale espirazione.</li>
+          <li><strong>Frequenza cardiaca a riposo (BPM):</strong> rilevala al mattino appena sveglio, ancora disteso e prima del caffè. Puoi usare uno smartwatch, contare i battiti al polso per 30 secondi e moltiplicare per 2, oppure usare il tasto <em>Tap BPM</em> qui sopra.</li>
+          <li><strong>Percentuale di massa grassa:</strong> inseriscila solo se deriva da plicometria, DEXA o bioimpedenziometria affidabile. Altrimenti lascia il campo vuoto: la stimeremo noi distinguendo chiaramente il dato stimato da quello misurato.</li>
+        </ul>
+      </details>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Calcola la mia Zona Aerobica</button>
+        <button type="button" class="btn btn-secondary" id="exampleBtn">Compila con dati di esempio</button>
+        <button type="button" class="btn btn-outline" id="resetBtn">Pulisci tutto</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- RISULTATI -->
+  <div id="results">
+    <div id="medicalBanner"></div>
+
+    <!-- SEZIONE 2: ANALISI CORPOREA -->
+    <section class="card">
+      <h2><span class="step-badge">2</span> Analisi delle caratteristiche corporee e cardiache</h2>
+      <div class="metrics-grid" id="metricsGrid"></div>
+      <p class="hint" id="metricsNote" style="margin-top:0.85rem;"></p>
+    </section>
+
+    <!-- SEZIONE 3: 5 ZONE CARDIACHE -->
+    <section class="card">
+      <h2><span class="step-badge">3</span> Le tue 5 zone di frequenza cardiaca</h2>
+      <p id="methodExplanation" style="margin-top:0; font-size:0.92rem; color:#334155;"></p>
+      <div class="zone-bar" aria-hidden="true">
+        <div class="zb-1"></div>
+        <div class="zb-2"></div>
+        <div class="zb-3"></div>
+        <div class="zb-4"></div>
+        <div class="zb-5"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Zona</th>
+              <th id="pctHeader">% FC</th>
+              <th>Intervallo BPM</th>
+              <th>Benefici fisiologici</th>
+              <th>Allenamento consigliato</th>
+            </tr>
+          </thead>
+          <tbody id="zonesTableBody"></tbody>
+        </table>
+      </div>
+      <p class="hint" style="margin-top:0.85rem;">
+        <strong>Limiti delle stime:</strong> la FC massima teorica (formula di Tanaka: 208 − 0,7 × età) ha un margine di errore individuale di circa ±7–10 BPM. Usa sempre questi valori insieme alla percezione dello sforzo (scala RPE) e al test del respiro.
+      </p>
+    </section>
+
+    <!-- SEZIONE 4: ZONA DIMAGRIMENTO -->
+    <section class="card">
+      <h2><span class="step-badge">4</span> La tua zona ottimale per il dimagrimento</h2>
+      <div class="alert alert-info" id="fatLossRationale"></div>
+
+      <div class="concepts-grid">
+        <div class="concept-card">
+          <h3>% di grassi usati durante l'esercizio</h3>
+          <p>A intensità bassa/moderata (Zona 2) la <strong>percentuale</strong> di energia ricavata dai grassi è alta, ma il dispendio calorico al minuto resta moderato. Non significa automaticamente dimagrire di più a parità di tempo breve.</p>
+        </div>
+        <div class="concept-card">
+          <h3>Calorie totali consumate</h3>
+          <p>Aumentando l'intensità bruci più <strong>calorie totali</strong> al minuto (usando più carboidrati), ma la fatica cresce rapidamente e rischi di ridurre durata, costanza settimanale e recupero.</p>
+        </div>
+        <div class="concept-card">
+          <h3>Perdita di grasso nel lungo periodo</h3>
+          <p>Il dimagrimento reale dipende dal <strong>deficit calorico sostenibile</strong> nel tempo. La tua zona consigliata bilancia ossidazione lipidica, consumo calorico e sostenibilità, così puoi accumulare volume ogni settimana senza esaurirti.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEZIONE 5: PROGRAMMA PERSONALIZZATO -->
+    <section class="card">
+      <h2><span class="step-badge">5</span> Programma di allenamento personalizzato (4 settimane)</h2>
+      <div id="programIntro" style="font-size:0.93rem; color:#334155; margin-bottom:1rem;"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Settimana</th>
+              <th>Frequenza</th>
+              <th>Durata / Sessione</th>
+              <th>Intensità target</th>
+              <th>Focus della settimana</th>
+            </tr>
+          </thead>
+          <tbody id="planTableBody"></tbody>
+        </table>
+      </div>
+      <div id="monitoringBox" style="margin-top:1rem; font-size:0.9rem; color:#334155;"></div>
+    </section>
+
+    <!-- SEZIONE 6: RIEPILOGO FINALE -->
+    <section class="summary-box">
+      <h2>6. Il tuo riepilogo operativo da Personal Trainer</h2>
+      <ul class="summary-list" id="finalSummary"></ul>
+    </section>
+
+    <div class="actions no-print" style="margin-bottom:1.5rem;">
+      <button type="button" class="btn btn-primary" onclick="window.print()">Stampa / Salva Scheda PDF</button>
+      <button type="button" class="btn btn-outline" onclick="window.scrollTo({top:0, behavior:'smooth'})">Modifica i dati</button>
+    </div>
+
+    <p class="disclaimer">
+      <strong>Nota importante:</strong> questo strumento ha esclusivamente finalità informative ed educative nell'ambito del fitness e non fornisce indicazioni mediche o diagnosi. Le formule di frequenza cardiaca forniscono stime e non sostituiscono una valutazione fisiologica (es. test da sforzo o VO2max). In presenza di patologie, sintomi o farmaci che modificano la frequenza cardiaca, consulta un medico prima di definire le tue zone di allenamento.
+    </p>
+  </div>
+</main>
+
+<script>
+  // --- STRUMENTO TAP BPM ---
+  const tapBox = document.getElementById('tapBox');
+  const toggleTapBtn = document.getElementById('toggleTapBtn');
+  const tapBeatBtn = document.getElementById('tapBeatBtn');
+  const resetTapBtn = document.getElementById('resetTapBtn');
+  const tapReadout = document.getElementById('tapReadout');
+  const fcRestInput = document.getElementById('fcRest');
+
+  let tapTimes = [];
+
+  toggleTapBtn.addEventListener('click', () => {
+    tapBox.classList.toggle('open');
+  });
+
+  tapBeatBtn.addEventListener('click', () => {
+    const now = Date.now();
+    if (tapTimes.length > 0 && now - tapTimes[tapTimes.length - 1] > 3000) {
+      tapTimes = [];
+    }
+    tapTimes.push(now);
+    if (tapTimes.length > 10) tapTimes.shift();
+
+    if (tapTimes.length >= 2) {
+      let sum = 0;
+      for (let i = 1; i < tapTimes.length; i++) {
+        sum += tapTimes[i] - tapTimes[i - 1];
+      }
+      const avgMs = sum / (tapTimes.length - 1);
+      const bpm = Math.round(60000 / avgMs);
+      tapReadout.textContent = `${bpm} BPM (${tapTimes.length} tocchi)`;
+      if (tapTimes.length >= 5 && bpm >= 35 && bpm <= 120) {
+        fcRestInput.value = bpm;
+      }
+    } else {
+      tapReadout.textContent = 'Continua a toccare...';
+    }
+  });
+
+  resetTapBtn.addEventListener('click', () => {
+    tapTimes = [];
+    tapReadout.textContent = '-- BPM';
+  });
+
+  // --- DATI DI ESEMPIO E RESET ---
+  document.getElementById('exampleBtn').addEventListener('click', () => {
+    document.getElementById('sex').value = 'M';
+    document.getElementById('age').value = 41;
+    document.getElementById('weight').value = 84;
+    document.getElementById('height').value = 178;
+    document.getElementById('waist').value = 95;
+    document.getElementById('bodyFat').value = '';
+    document.getElementById('fcRest').value = 66;
+    document.getElementById('level').value = 'principiante';
+    document.getElementById('activity').value = 'camminata';
+    document.getElementById('medicalNotes').value = '';
+    document.getElementById('hasMedical').checked = false;
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    document.getElementById('ptForm').reset();
+    document.getElementById('results').classList.remove('visible');
+    tapTimes = [];
+    tapReadout.textContent = '-- BPM';
+  });
+
+  // --- CALCOLO PRINCIPALE ---
+  document.getElementById('ptForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    calculateAndRender();
+  });
+
+  function bmiCategory(bmi) {
+    if (bmi < 18.5) return 'Sottopeso';
+    if (bmi < 25) return 'Normopeso';
+    if (bmi < 30) return 'Sovrappeso';
+    return 'Obesità';
+  }
+
+  function activityLabel(act) {
+    const map = {
+      camminata: 'Camminata veloce / in salita',
+      corsa: 'Corsa',
+      cyclette: 'Cyclette / Bici',
+      ellittica: 'Ellittica',
+      nuoto: 'Nuoto'
+    };
+    return map[act] || act;
+  }
+
+  function calculateAndRender() {
+    const sex = document.getElementById('sex').value;
+    const age = parseFloat(document.getElementById('age').value);
+    const weight = parseFloat(document.getElementById('weight').value);
+    const height = parseFloat(document.getElementById('height').value);
+    const waistVal = document.getElementById('waist').value.trim();
+    const waist = waistVal ? parseFloat(waistVal) : null;
+    const bfVal = document.getElementById('bodyFat').value.trim();
+    const bfMeasured = bfVal ? parseFloat(bfVal) : null;
+    const fcRestVal = document.getElementById('fcRest').value.trim();
+    const fcRest = fcRestVal ? parseFloat(fcRestVal) : null;
+    const level = document.getElementById('level').value;
+    const activity = document.getElementById('activity').value;
+    const medicalNotes = document.getElementById('medicalNotes').value.trim();
+    const hasMedical = document.getElementById('hasMedical').checked || medicalNotes.length > 0;
+
+    if (!age || !weight || !height) return;
+
+    // 1. Analisi corporea
+    const heightM = height / 100;
+    const bmi = weight / (heightM * heightM);
+    const whtr = waist ? (waist / height) : null;
+
+    // Massa grassa: misurata o stimata (Deurenberg)
+    let bfUsed, bfIsMeasured;
+    if (bfMeasured !== null && !isNaN(bfMeasured)) {
+      bfUsed = bfMeasured;
+      bfIsMeasured = true;
+    } else {
+      const sexNum = sex === 'M' ? 1 : 0;
+      const est = (1.20 * bmi) + (0.23 * age) - (10.8 * sexNum) - 5.4;
+      bfUsed = Math.min(58, Math.max(6, est));
+      bfIsMeasured = false;
+    }
+
+    const leanMass = weight * (1 - bfUsed / 100);
+
+    // BMR: Katch-McArdle se massa grassa misurata, altrimenti Mifflin-St Jeor
+    let bmr, bmrFormula;
+    if (bfIsMeasured) {
+      bmr = Math.round(370 + 21.6 * leanMass);
+      bmrFormula = 'Katch-McArdle (da massa magra)';
+    } else {
+      bmr = Math.round(10 * weight + 6.25 * height - 5 * age + (sex === 'M' ? 5 : -161));
+      bmrFormula = 'Mifflin-St Jeor';
+    }
+
+    // FC Max (Tanaka) e HRR (Karvonen)
+    const fcMax = Math.round(208 - 0.7 * age);
+    const useKarvonen = fcRest !== null && !isNaN(fcRest) && fcRest < fcMax - 20;
+    const hrr = useKarvonen ? (fcMax - fcRest) : null;
+
+    // Adattamento fisiologico per il nuoto (~ -9 BPM per posizione orizzontale e riflesso di immersione)
+    const swimOffset = activity === 'nuoto' ? -9 : 0;
+
+    function calcBpm(pct) {
+      const base = useKarvonen
+        ? fcRest + hrr * pct
+        : fcMax * pct;
+      return Math.round(base + swimOffset);
+    }
+
+    // --- AVVISO MEDICO ---
+    const medicalBanner = document.getElementById('medicalBanner');
+    if (hasMedical) {
+      medicalBanner.innerHTML = `
+        <div class="alert alert-danger">
+          <strong>Attenzione – Valutazione medica raccomandata:</strong> hai segnalato condizioni di salute o farmaci${medicalNotes ? ` (<em>${escapeHtml(medicalNotes)}</em>)` : ''}.
+          Alcuni farmaci (come i betabloccanti) o condizioni cardiovascolari alterano la risposta del battito cardiaco rendendo meno affidabili le formule teoriche.
+          <strong>Consulta il tuo medico prima di allenarti seguendo questi BPM</strong> e, nel frattempo, fai riferimento alla percezione dello sforzo (scala RPE 4–6 su 10, sforzo moderato in cui riesci ancora a parlare).
+        </div>
+      `;
+    } else {
+      medicalBanner.innerHTML = '';
+    }
+
+    // --- RENDER SEZIONE 2: METRICHE ---
+    const metrics = [
+      {
+        label: 'BMI',
+        value: bmi.toFixed(1),
+        sub: bmiCategory(bmi),
+        measured: false,
+        tagText: 'Calcolato da misure'
+      },
+      {
+        label: 'Metabolismo Basale (BMR)',
+        value: `${bmr} kcal`,
+        sub: bmrFormula,
+        measured: false,
+        tagText: 'Stimato'
+      },
+      {
+        label: 'Massa Grassa',
+        value: `${bfUsed.toFixed(1)}%`,
+        sub: `Massa magra ~${leanMass.toFixed(1)} kg`,
+        measured: bfIsMeasured,
+        tagText: bfIsMeasured ? 'Misurato' : 'Stimato (Deurenberg)'
+      },
+      {
+        label: 'FC Massima Teorica',
+        value: `${fcMax} BPM`,
+        sub: 'Formula di Tanaka',
+        measured: false,
+        tagText: 'Stimato'
+      }
+    ];
+
+    if (whtr !== null) {
+      let whtrStatus = 'Nella norma (< 0,50)';
+      if (whtr >= 0.60) whtrStatus = 'Rischio metabolico elevato';
+      else if (whtr >= 0.50) whtrStatus = 'Attenzione grasso viscerale';
+      metrics.push({
+        label: 'Rapporto Vita / Altezza',
+        value: whtr.toFixed(2),
+        sub: whtrStatus,
+        measured: true,
+        tagText: 'Misurato'
+      });
+    }
+
+    if (useKarvonen) {
+      metrics.push({
+        label: 'FC Riposo / Riserva (HRR)',
+        value: `${fcRest} / ${hrr} BPM`,
+        sub: 'Metodo Karvonen attivo',
+        measured: true,
+        tagText: 'FC riposo misurata'
+      });
+    } else {
+      metrics.push({
+        label: 'FC a Riposo',
+        value: 'Non inserita',
+        sub: 'Usata % di FC Max',
+        measured: false,
+        tagText: 'Solo stima FC Max'
+      });
+    }
+
+    document.getElementById('metricsGrid').innerHTML = metrics.map(m => `
+      <div class="metric-card">
+        <span class="metric-label">${m.label}</span>
+        <span class="metric-value">${m.value}</span>
+        <span class="metric-sub">${m.sub}</span>
+        <span class="tag ${m.measured ? 'tag-measured' : 'tag-estimated'}">${m.tagText}</span>
+      </div>
+    `).join('');
+
+    document.getElementById('metricsNote').textContent =
+      `Dati misurati inseriti: peso (${weight} kg), altezza (${height} cm)${waist ? `, vita (${waist} cm)` : ''}${bfIsMeasured ? `, massa grassa (${bfMeasured}%)` : ''}${useKarvonen ? `, FC a riposo (${fcRest} BPM)` : ''}. I valori marcati come "Stimato" derivano da formule statistiche.`;
+
+    // --- SEZIONE 3: 5 ZONE CARDIACHE ---
+    const pctHeader = document.getElementById('pctHeader');
+    pctHeader.textContent = useKarvonen ? '% HRR (Karvonen)' : '% FC Max';
+
+    document.getElementById('methodExplanation').innerHTML = useKarvonen
+      ? `Calcolo eseguito con il <strong>metodo di Karvonen (Frequenza Cardiaca di Riserva)</strong> usando la tua FC a riposo di <strong>${fcRest} BPM</strong>. È più preciso rispetto alla semplice percentuale della FC massima perché tiene conto del tuo grado di allenamento cardiaco.${swimOffset ? ' <em>Nota nuoto: i valori in BPM includono una correzione di −9 BPM per la posizione orizzontale e l’immersione in acqua.</em>' : ''}`
+      : `Calcolo eseguito sulla <strong>% della Frequenza Cardiaca Massima stimata</strong> (${fcMax} BPM). Inserendo la tua FC a riposo potrai attivare il metodo Karvonen per una stima ancora più personalizzata.${swimOffset ? ' <em>Nota nuoto: i valori in BPM includono una correzione di −9 BPM per la posizione orizzontale e l’immersione in acqua.</em>' : ''}`;
+
+    const zones = [
+      {
+        num: 1, name: 'Zona 1 – Recupero', color: 'var(--z1)', min: 0.50, max: 0.60,
+        benefits: 'Migliora circolazione, recupero attivo e abitudine al movimento senza stress articolare.',
+        training: 'Camminata leggera, pedalata agile di defaticamento, riscaldamento.'
+      },
+      {
+        num: 2, name: 'Zona 2 – Aerobica moderata', color: 'var(--z2)', min: 0.60, max: 0.70,
+        benefits: 'Massimizza efficienza mitocondriale, capillarizzazione e utilizzo dei grassi come carburante.',
+        training: 'Lavoro continuo di fondo (35–60 min), base ideale per dimagrimento sostenibile.'
+      },
+      {
+        num: 3, name: 'Zona 3 – Aerobica medio-intensa', color: 'var(--z3)', min: 0.70, max: 0.80,
+        benefits: 'Aumenta capacità aerobica e dispendio calorico orario; mix bilanciato di grassi e carboidrati.',
+        training: 'Ritmo sostenuto continuo (tempo run/ride) o blocchi medi da 10–20 min.'
+      },
+      {
+        num: 4, name: 'Zona 4 – Soglia intensa', color: 'var(--z4)', min: 0.80, max: 0.90,
+        benefits: 'Innalza la soglia anaerobica e la tolleranza allo sforzo; consumo calorico molto alto ma breve.',
+        training: 'Intervalli strutturati (es. 4×4 min) riservati a chi ha già una buona base aerobica.'
+      },
+      {
+        num: 5, name: 'Zona 5 – Massimale', color: 'var(--z5)', min: 0.90, max: 1.00,
+        benefits: 'Stimola la potenza aerobica massima (VO2max) e la capacità neuromuscolare.',
+        training: 'Sprint brevi (30–90 sec) con ampio recupero; non necessaria per il dimagrimento.'
+      }
+    ];
+
+    // --- SEZIONE 4: CALCOLO ZONA PERSONALIZZATA DIMAGRIMENTO ---
+    let fatMinPct, fatMaxPct, idealPct, highlightZoneNum;
+    let reasons = [];
+
+    const highWeightLoad = bmi >= 30 || (whtr !== null && whtr >= 0.58);
+    const higherRestHr = useKarvonen && fcRest >= 78;
+
+    if (level === 'principiante' || age >= 60 || highWeightLoad || higherRestHr) {
+      fatMinPct = useKarvonen ? 0.58 : 0.60;
+      fatMaxPct = useKarvonen ? 0.68 : 0.69;
+      idealPct = useKarvonen ? 0.63 : 0.65;
+      highlightZoneNum = 2;
+      if (level === 'principiante') reasons.push('livello principiante (priorità a costruire la base aerobica senza affaticamento eccessivo)');
+      if (highWeightLoad) reasons.push('carico corporeo/viscerale elevato (serve proteggere le articolazioni e favorire sessioni costanti)');
+      if (age >= 60) reasons.push('età ≥ 60 anni (progressione graduale e sicurezza cardiovascolare)');
+      if (higherRestHr) reasons.push(`FC a riposo relativamente alta (${fcRest} BPM, margine di miglioramento aerobico)`);
+    } else if (level === 'intermedio') {
+      fatMinPct = useKarvonen ? 0.62 : 0.64;
+      fatMaxPct = useKarvonen ? 0.72 : 0.74;
+      idealPct = useKarvonen ? 0.67 : 0.69;
+      highlightZoneNum = 2;
+      reasons.push('livello intermedio con buona tolleranza al volume aerobico');
+      reasons.push('equilibrio ottimale tra ossidazione dei grassi in Zona 2 e aumento del dispendio calorico nella fascia bassa di Zona 3');
+    } else {
+      fatMinPct = useKarvonen ? 0.65 : 0.68;
+      fatMaxPct = useKarvonen ? 0.76 : 0.77;
+      idealPct = useKarvonen ? 0.70 : 0.72;
+      highlightZoneNum = 2;
+      reasons.push('livello avanzato con alta efficienza aerobica e recupero rapido');
+      reasons.push('possibilità di sostenere la parte alta della Zona 2 e l’ingresso in Zona 3 massimizzando le calorie bruciate per sessione senza compromettere la settimana');
+    }
+
+    const fatMinBpm = calcBpm(fatMinPct);
+    const fatMaxBpm = calcBpm(fatMaxPct);
+    const idealBpm = calcBpm(idealPct);
+
+    // Popola tabella zone
+    document.getElementById('zonesTableBody').innerHTML = zones.map(z => {
+      const low = calcBpm(z.min);
+      const high = calcBpm(z.max);
+      const isHighlight = z.num === highlightZoneNum;
+      return `
+        <tr class="${isHighlight ? 'highlight-row' : ''}">
+          <td><span class="zone-pill"><span class="dot" style="background:${z.color}"></span>${z.name}${isHighlight ? ' ★' : ''}</span></td>
+          <td>${Math.round(z.min * 100)}–${Math.round(z.max * 100)}%</td>
+          <td><strong>${low} – ${high} BPM</strong></td>
+          <td>${z.benefits}</td>
+          <td>${z.training}</td>
+        </tr>
+      `;
+    }).join('');
+
+    // Razionale zona dimagrimento
+    let activityAdvice = activityLabel(activity);
+    let jointWarning = '';
+    if (activity === 'corsa' && (highWeightLoad || level === 'principiante')) {
+      jointWarning = `<br><br><strong>Consiglio pratico sull'attività:</strong> hai scelto la corsa, ma con il tuo profilo attuale può far salire troppo rapidamente il battito e caricare le articolazioni. Alterna <strong>camminata veloce/in salita</strong> o <strong>cyclette/ellittica</strong> finché non riesci a rimanere comodamente nella tua zona target.`;
+      activityAdvice = 'Camminata veloce / in salita o Cyclette (alternata a brevi tratti di corsa graduale)';
+    }
+
+    document.getElementById('fatLossRationale').innerHTML = `
+      <strong>Zona aerobica personalizzata per te: ${fatMinBpm} – ${fatMaxBpm} BPM</strong> (target ideale: <strong>${idealBpm} BPM</strong>).<br>
+      Non è un generico 60–70% standard: l'abbiamo calibrata considerando: <strong>${reasons.join('; ')}</strong>.${swimOffset ? ' Abbiamo inoltre applicato l’adattamento fisiologico per il nuoto (−9 BPM).' : ''}${jointWarning}
+    `;
+
+    // --- SEZIONE 5: PROGRAMMA 4 SETTIMANE ---
+    let sessionsPerWeek, baseDuration, idealDurationText, planRows;
+
+    if (level === 'principiante' || highWeightLoad) {
+      sessionsPerWeek = '3–4 sessioni / settimana';
+      baseDuration = 30;
+      idealDurationText = '35–45 minuti';
+      planRows = [
+        ['Settimana 1', '3 sessioni', '25–30 min', `${fatMinBpm}–${idealBpm} BPM`, 'Adattamento: impara a mantenere il battito stabile senza andare in affanno.'],
+        ['Settimana 2', '3–4 sessioni', '30–35 min', `${fatMinBpm}–${fatMaxBpm} BPM`, 'Continuità: aggiungi 5 minuti per sessione mantenendo il passo regolare.'],
+        ['Settimana 3', '4 sessioni', '35–40 min', `${idealBpm}–${fatMaxBpm} BPM`, 'Consolidamento aerobico: inserisci 5 min di riscaldamento e 5 di defaticamento.'],
+        ['Settimana 4', '4 sessioni', '40–45 min', `${fatMinBpm}–${fatMaxBpm} BPM`, 'Volume efficace: resta vicino al target ideale di ' + idealBpm + ' BPM.']
+      ];
+    } else if (level === 'intermedio') {
+      sessionsPerWeek = '4 sessioni / settimana';
+      baseDuration = 40;
+      idealDurationText = '45–55 minuti';
+      planRows = [
+        ['Settimana 1', '3–4 sessioni', '40 min', `${fatMinBpm}–${fatMaxBpm} BPM`, 'Stabilizzazione in Zona 2 alta con ritmo fluido e continuo.'],
+        ['Settimana 2', '4 sessioni', '45 min', `${idealBpm}–${fatMaxBpm} BPM`, 'Aumento del volume settimanale; 1 sessione leggermente più lunga (50 min).'],
+        ['Settimana 3', '4 sessioni', '45–50 min', `${fatMinBpm}–${fatMaxBpm} BPM`, 'Inserisci 1 sessione con 2×8 min in Zona 3 bassa per alzare il dispendio calorico.'],
+        ['Settimana 4', '4–5 sessioni', '50–55 min', `${idealBpm} BPM (media)`, 'Picco sostenibile di volume; valuta poi se la FC a riposo è scesa di 2–4 BPM.']
+      ];
+    } else {
+      sessionsPerWeek = '4–5 sessioni / settimana';
+      baseDuration = 50;
+      idealDurationText = '50–65 minuti';
+      planRows = [
+        ['Settimana 1', '4 sessioni', '45–50 min', `${fatMinBpm}–${fatMaxBpm} BPM`, 'Volume aerobico controllato (80% in zona target).'],
+        ['Settimana 2', '4–5 sessioni', '50–55 min', `${idealBpm}–${fatMaxBpm} BPM`, 'Aggiungi 1 sessione lunga (60 min) a intensità costante.'],
+        ['Settimana 3', '5 sessioni', '50–60 min', `${fatMinBpm}–${fatMaxBpm} BPM`, 'Polarizzazione leggera: 4 sedute aerobiche + 1 seduta con 4×5 min in Zona 3–4.'],
+        ['Settimana 4', '4–5 sessioni', '55–65 min', `${idealBpm} BPM (media)`, 'Consolidamento del dispendio settimanale con recupero curato.']
+      ];
+    }
+
+    document.getElementById('programIntro').innerHTML = `
+      <strong>Attività consigliata:</strong> ${activityAdvice}. Ogni sessione prevede <strong>5–8 minuti di riscaldamento</strong> graduale in Zona 1 prima di entrare nella tua zona target e <strong>5 minuti di defaticamento</strong> finale. Per preservare la massa magra mentre dimagrisci, abbina se possibile 2 brevi sedute settimanali di rinforzo muscolare.
+    `;
+
+    document.getElementById('planTableBody').innerHTML = planRows.map(r => `
+      <tr>
+        <td><strong>${r[0]}</strong></td>
+        <td>${r[1]}</td>
+        <td>${r[2]}</td>
+        <td><strong>${r[3]}</strong></td>
+        <td>${r[4]}</td>
+      </tr>
+    `).join('');
+
+    document.getElementById('monitoringBox').innerHTML = `
+      <strong>Come monitorare i progressi ogni 2–3 settimane:</strong>
+      (1) <strong>Circonferenza vita</strong> al mattino (indicatore più fedele della sola bilancia);
+      (2) <strong>FC a riposo</strong> al risveglio (quando scende di 2–5 BPM il cuore è diventato più efficiente);
+      (3) <strong>Passo/potenza a parità di BPM</strong>: se riesci ad andare più veloce mantenendo ${idealBpm} BPM, la tua capacità aerobica sta crescendo.
+    `;
+
+    // --- SEZIONE 6: RIEPILOGO FINALE IN 5 PUNTI ---
+    document.getElementById('finalSummary').innerHTML = `
+      <li>
+        <strong>1. Zona aerobica consigliata</strong>
+        <span>${fatMinBpm} – ${fatMaxBpm} BPM</span>
+      </li>
+      <li>
+        <strong>2. Frequenza cardiaca ideale</strong>
+        <span>~${idealBpm} BPM</span>
+      </li>
+      <li>
+        <strong>3. Durata consigliata</strong>
+        <span>${idealDurationText} per sessione</span>
+      </li>
+      <li>
+        <strong>4. Frequenza settimanale</strong>
+        <span>${sessionsPerWeek}</span>
+      </li>
+      <li style="grid-column: 1 / -1;">
+        <strong>5. Come capire se stai lavorando alla giusta intensità (senza fissare solo l'orologio)</strong>
+        <span>Usa il <em>Talk Test</em> e la scala RPE: devi percepire uno sforzo moderato (<strong>5–6 su 10</strong>), respirare più profondamente ma riuscire ancora a pronunciare frasi intere senza boccheggiare. Se riesci a cantare stai andando troppo piano; se riesci a dire solo 2–3 parole alla volta sei salito troppo di intensità.</span>
+      </li>
+    `;
+
+    // Mostra e scorri ai risultati
+    const resultsEl = document.getElementById('results');
+    resultsEl.classList.add('visible');
+    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, (m) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[m]));
+  }
+</script>
+
+</body>
+</html>
